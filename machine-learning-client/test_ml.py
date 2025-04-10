@@ -3,11 +3,10 @@ import pytest
 import sys
 import os
 from unittest.mock import patch, MagicMock
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
 
-from app import app
-from db_handler import DBHandler
-from face_analyzer import FaceAnalyzer
+from src.app import app
+from src.db_handler import DBHandler
+from src.face_analyzer import FaceAnalyzer
 
 # ----------------------
 # Test face_analyzer.py
