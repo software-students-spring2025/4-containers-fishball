@@ -1,10 +1,5 @@
 import io
-import base64
-import sys
 import os
-from datetime import datetime
-from unittest.mock import MagicMock
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
 
 os.environ.setdefault("SECRET_KEY", "test_secret_key")
 os.environ.setdefault("MONGO_DBNAME", "test_db")
@@ -14,14 +9,16 @@ os.environ.setdefault("ML_CLIENT_URL", "http://fake-ml-client")
 import pytest
 from PIL import Image
 from bson.objectid import ObjectId
-from app import app, images_collection
+from src.app import app
 
 def generate_valid_objectid():
     return str(ObjectId())
 
+
 ###############################################################################
 # Fake Collection for Overriding MongoDB Operations in Tests
 ###############################################################################
+
 
 class FakeImagesCollection:
     def __init__(self):
@@ -30,8 +27,10 @@ class FakeImagesCollection:
     def insert_one(self, doc):
         doc["_id"] = "test_id"
         self.data["test_id"] = doc
+
         class DummyResult:
             inserted_id = "test_id"
+
         return DummyResult()
 
     def find(self):
@@ -41,15 +40,18 @@ class FakeImagesCollection:
         _id = query.get("_id")
         return self.data.get(_id, None)
 
+
 ###############################################################################
 # Pytest Fixtures
 ###############################################################################
 
+
 @pytest.fixture(autouse=True)
 def fake_images_collection(monkeypatch):
     fake_collection = FakeImagesCollection()
-    monkeypatch.setattr("app.images_collection", fake_collection)
+    monkeypatch.setattr("src.app.images_collection", fake_collection)
     return fake_collection
+
 
 class FakeResponse:
     def __init__(self, json_data, status_code=200):
@@ -63,15 +65,19 @@ class FakeResponse:
     def json(self):
         return self._json
 
+
 @pytest.fixture
 def fake_requests_post(monkeypatch):
     def fake_post(url, json, timeout):
         return FakeResponse({"result": "happy"})
-    monkeypatch.setattr("app.requests.post", fake_post)
+
+    monkeypatch.setattr("src.app.requests.post", fake_post)
+
 
 ###############################################################################
 # Test Cases
 ###############################################################################
+
 
 def test_index_get():
     """Test that the GET '/' endpoint returns a 200 OK and renders a page."""
@@ -80,12 +86,14 @@ def test_index_get():
         assert response.status_code == 200
         assert b"Upload" in response.data or b"upload" in response.data
 
+
 def test_index_post_no_file():
     """Test POST without a file returns an error flash and redirect."""
     with app.test_client() as client:
         response = client.post("/", data={}, follow_redirects=True)
         assert response.status_code == 200
         assert b"Image Upload & Capture" in response.data
+
 
 def test_index_post_empty_filename():
     """Test POST with an empty file name returns an error."""
@@ -94,6 +102,7 @@ def test_index_post_empty_filename():
         response = client.post("/", data=data, follow_redirects=True)
         assert response.status_code == 200
         assert b"No file selected" in response.data
+
 
 def test_index_post_invalid_image(monkeypatch):
     """Test POST with an invalid image (simulating a PIL error)."""
@@ -104,6 +113,7 @@ def test_index_post_invalid_image(monkeypatch):
         response = client.post("/", data=data, follow_redirects=True)
         assert response.status_code == 200
         assert b"Invalid image format!" in response.data
+
 
 def test_index_post_success(fake_requests_post):
     """Test successful POST: a valid image is processed and stored."""
@@ -123,9 +133,10 @@ def test_index_post_success(fake_requests_post):
         assert response.status_code == 200
         assert b"Image uploaded and processed successfully!" in response.data
 
+
 def test_get_image_not_found():
     """Test that a GET to a non-existent image ID redirects to index."""
-    non_existent_id = "000000000000000000000000" 
+    non_existent_id = "000000000000000000000000"
     with app.test_client() as client:
         response = client.get(f"/uploads/{non_existent_id}", follow_redirects=True)
         assert response.status_code == 200
