@@ -21,13 +21,7 @@ class Config:
     ENFORCE_DETECTION = os.getenv("ENFORCE_DETECTION", "true").lower() == "true"
 
     # MongoDB
-    MONGO_URI = (
-        f"mongodb://{os.getenv('MONGO_INITDB_ROOT_USERNAME')}:"
-        f"{os.getenv('MONGO_INITDB_ROOT_PASSWORD')}@"
-        f"{os.getenv('MONGO_HOST')}:"
-        f"{os.getenv('MONGO_PORT')}/"
-        f"{os.getenv('MONGO_DB')}?authSource=admin"
-    )
+    MONGO_URI = os.getenv("MONGO_URI")
     MONGO_DB = os.getenv("MONGO_DB")
 
     # Flask
