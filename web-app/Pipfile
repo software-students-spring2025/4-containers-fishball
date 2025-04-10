@@ -12,6 +12,7 @@ python-dotenv = "*"
 pylint = "*"
 black = "*"
 tomli = "*"
+typing_extensions = "*"
 
 [dev-packages]
 
