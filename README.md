@@ -1,8 +1,25 @@
 ![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)
+![log github events](https://github.com/software-students-spring2025/4-containers-fishball/actions/workflows/event-logger.yml/badge.svg)
 
 # Containerized App Exercise
 
 Build a containerized app that uses machine learning. See [instructions](./instructions.md) for details.
+
+## Introduction
+
+In this project, we have three Docker containers: MongoDB, machine-learning-client, and web-app. The system allows users to upload images or capture photos using their webcam, analyze facial emotions, and view emotion-related statistics based on their uploads.
+
+Users can register and log in to the web-app, then upload an image through the upload feature or take a live photo using their webcam. The machine-learning-client then analyzes the image using a facial emotion recognition model and returns the detected emotions to the user. After that, users can view the results of their past emotion analyses on their main page and explore emotion trends based on their uploaded images.
+
+## Team
+
+- [Jinzhi Cao](https://github.com/eth3r3aI)
+
+- [Lan Yao](https://github.com/ziiiimu)
+
+- [Lauren Zhou](https://github.com/laurenlz)
+
+- [Lily Fu](https://github.com/fulily0325)
 
 ## System Requirements
 
