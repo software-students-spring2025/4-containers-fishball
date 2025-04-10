@@ -54,11 +54,9 @@ def analyze():
     except (OSError, ValueError) as e:
         os.remove(temp_path)
         return jsonify({"error": str(e)}), 400
-    except RuntimeError as e:  # Handle runtime-specific errors
+    except RuntimeError as e:  # Fallback for unexpected runtime errors
         os.remove(temp_path)
-        return jsonify({"error": str(e)}), 500
-    except Exception as e:  # Fallback for unexpected errors
-        os.remove(temp_path)
+        app.logger.error(f"Unexpected error: {e}")
         return jsonify({"error": "An unexpected error occurred"}), 500
 
 
