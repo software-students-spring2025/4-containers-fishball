@@ -1,59 +1,76 @@
-"""Machine learning client that detects emotions using FER and MongoDB."""
+"""
+This module provides a Flask application for analyzing images for faces
+and retrieving analysis results from a database.
+"""
 
-import io
 import os
-import time
+import uuid
+from flask import Flask, request, jsonify
+from face_analyzer import FaceAnalyzer
+from db_handler import DBHandler
+from config import Config
 
-from dotenv import load_dotenv
-from pymongo import MongoClient
-from PIL import Image, UnidentifiedImageError
-from fer import FER
-import gridfs
-from gridfs.errors import NoFile
+app = Flask(__name__)
+app.config.from_object(Config)
 
-load_dotenv()
-
-MONGO_URI = os.getenv("MONGO_URI")
-MONGO_DBNAME = os.getenv("MONGO_DBNAME")
-COLLECTION = "images"
-
-client = MongoClient(MONGO_URI)
-db = client[MONGO_DBNAME]
-fs = gridfs.GridFS(db)
-collection = db[COLLECTION]
-analyzer = FER()
+analyzer = FaceAnalyzer()
+database = DBHandler()
 
 
-def analyze_image(image_bytes):
-    """Run FER analysis on an image and return detected emotions."""
-    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    result = analyzer.detect_emotions(image)
-    return result
+@app.route("/analyze", methods=["POST"])
+def analyze():
+    """
+    Endpoint to analyze an uploaded image for faces.
+    Returns the analysis results or an error message.
+    """
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    file = request.files["file"]
+    if not file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
+        return jsonify({"error": "Invalid file type"}), 400
+
+    temp_path = f"/tmp/{uuid.uuid4()}{os.path.splitext(file.filename)[1]}"
+    file.save(temp_path)
+
+    try:
+        results = analyzer.analyze(temp_path)
+        if not results:
+            return jsonify({"error": "No faces detected"}), 400
+
+        analysis_id = database.store_analysis(temp_path, results)
+        os.remove(temp_path)
+        return (
+            jsonify(
+                {
+                    "analysis_id": str(analysis_id),
+                    "results": results,
+                    "models": Config.DEEPFACE_MODELS,
+                }
+            ),
+            200,
+        )
+
+    except (OSError, ValueError) as e:
+        os.remove(temp_path)
+        return jsonify({"error": str(e)}), 400
+    except RuntimeError as e:  # Fallback for unexpected runtime errors
+        os.remove(temp_path)
+        app.logger.error("Unexpected error: %s", e)
+        return jsonify({"error": "An unexpected error occurred"}), 500
 
 
-def process_pending_images():
-    """Find unprocessed images in the DB, analyze, and update."""
-    pending = collection.find({"status": "pending"})
-    for doc in pending:
-        file_id = doc.get("file_id")
-        if not file_id:
-            print(f"Skipping invalid document: {doc}")
-            continue
-
-        print(f"Processing image with file_id: {file_id}")
-        try:
-            image_bytes = fs.get(file_id).read()
-            result = analyze_image(image_bytes)
-            collection.update_one(
-                {"_id": doc["_id"]}, {"$set": {"status": "complete", "result": result}}
-            )
-            print(f"Analysis complete for {file_id}")
-        except (NoFile, UnidentifiedImageError) as e:
-            print(f"Known processing error: {e}")
+@app.route("/analysis/<analysis_id>", methods=["GET"])
+def get_analysis(analysis_id):
+    """
+    Endpoint to retrieve analysis results by analysis ID.
+    Returns the analysis data or an error message.
+    """
+    analysis = database.get_analysis(analysis_id)
+    if not analysis:
+        return jsonify({"error": "Analysis not found"}), 404
+    return jsonify(analysis)
 
 
 if __name__ == "__main__":
-    print("Machine Learning client started. Waiting for new images...")
-    while True:
-        process_pending_images()
-        time.sleep(5)
+    app.run(host="0.0.0.0", port=5000)
