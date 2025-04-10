@@ -1,5 +1,6 @@
 ![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)
 ![log github events](https://github.com/software-students-spring2025/4-containers-fishball/actions/workflows/event-logger.yml/badge.svg)
+![ML Client CI](https://github.com/software-students-spring2025/4-containers-fishball/actions/workflows/ml-client.yml/badge.svg)
 
 # Containerized App Exercise
 
