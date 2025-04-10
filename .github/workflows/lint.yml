@@ -19,7 +19,7 @@ jobs:
           cd ${{ matrix.subdir }}
           python -m pip install --upgrade pip
           python -m pip install pipenv
-          pipenv install --dev --python $(which python)
+          pipenv install --dev --deploy --ignore-pipfile
       - name: Lint with pylint
         if: ${{ hashFiles(format('{0}/**/*.py', matrix.subdir)) != '' }}
         run: |
