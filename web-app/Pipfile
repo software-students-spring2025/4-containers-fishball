@@ -11,6 +11,7 @@ pillow = "*"
 python-dotenv = "*"
 pylint = "*"
 black = "*"
+tomli = "*"
 
 [dev-packages]
 
