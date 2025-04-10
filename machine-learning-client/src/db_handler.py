@@ -18,7 +18,7 @@ class DBHandler:
         Initializes the database handler with a MongoDB client and database.
         """
         self.client = MongoClient(Config.MONGO_URI)
-        self.database = self.client[Config.MONGO_DB]
+        self.database = self.client[Config.MONGO_DBNAME]
 
     def store_analysis(self, image_path, results):
         """

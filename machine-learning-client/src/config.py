@@ -22,7 +22,7 @@ class Config:
 
     # MongoDB
     MONGO_URI = os.getenv("MONGO_URI")
-    MONGO_DB = os.getenv("MONGO_DB")
+    MONGO_DBNAME = os.getenv("MONGO_DBNAME")
 
     # Flask
     SECRET_KEY = os.getenv("FLASK_SECRET_KEY")
