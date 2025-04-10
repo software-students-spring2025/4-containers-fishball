@@ -1,13 +1,21 @@
-[[source]]
-url = "https://pypi.org/simple"
-verify_ssl = true
-name = "pypi"
+FROM python:3.9-slim
 
-[packages]
-pylint = "*"
-black = "*"
+# Install DeepFace dependencies
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
-[dev-packages]
+WORKDIR /app
 
-[requires]
-python_version = "3.10"
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY src/ .
+
+# Pre-download models (optional)
+RUN python -c "from deepface import DeepFace; \
+    DeepFace.build_model('Facenet'); \
+    DeepFace.build_model('Emotion')"
+
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--timeout", "120", "app:app"]
