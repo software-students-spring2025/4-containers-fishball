@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Image Upload & Capture</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+      }
+      video {
+        width: 320px;
+        height: 240px;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+      }
+      canvas {
+        display: none;
+      }
+      form {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <!-- A simple form with file input and camera capture functionality -->
+    <form id="uploadForm" action="/" method="post" enctype="multipart/form-data">
+      <!-- Option 1: Select an image from file -->
+      <div>
+        <input type="file" name="image" accept="image/*" />
+      </div>
+      <hr style="margin: 20px 0;">
+      <!-- Option 2: Capture a photo using the camera -->
+      <div>
+        <button type="button" id="startCamera">Open Camera</button>
+        <button type="button" id="captureButton" style="display:none;">Capture Photo</button>
+      </div>
+      <div>
+        <video id="video" autoplay style="display:none;"></video>
+      </div>
+      <!-- Hidden input to store the captured image as base64 -->
+      <input type="hidden" name="captured_image" id="captured_image" />
+      <br>
+      <button type="submit">Upload</button>
+    </form>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+      const startCameraBtn = document.getElementById('startCamera');
+      const captureBtn = document.getElementById('captureButton');
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const capturedImageInput = document.getElementById('captured_image');
+
+      startCameraBtn.addEventListener('click', async () => {
+        try {
+          // Request access to the camera
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          video.srcObject = stream;
+          video.style.display = 'block';
+          captureBtn.style.display = 'inline';
+        } catch (err) {
+          alert('Error accessing camera: ' + err);
+        }
+      });
+
+      captureBtn.addEventListener('click', () => {
+        // Set canvas dimensions to match video stream
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        // Draw the current video frame to the canvas
+        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+        // Convert the canvas image to a base64-encoded JPEG string
+        const dataURL = canvas.toDataURL('image/jpeg');
+        capturedImageInput.value = dataURL;
+        alert('Photo captured. It will be uploaded along with your form data.');
+      });
+    </script>
+  </body>
+</html>
