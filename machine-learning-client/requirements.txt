@@ -1,1 +1,4 @@
 pymongo
+python-dotenv
+fer
+Pillow
