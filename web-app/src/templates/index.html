@@ -25,6 +25,16 @@
     </style>
   </head>
   <body>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
     <!-- A simple form with file input and camera capture functionality -->
     <form id="uploadForm" action="/" method="post" enctype="multipart/form-data">
       <!-- Option 1: Select an image from file -->

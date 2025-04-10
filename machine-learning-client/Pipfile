@@ -11,10 +11,13 @@ pymongo = "==4.3.3"
 python-dotenv = "==1.0.0"
 opencv-python = "==4.7.0.72"
 python-multipart = "==0.0.6"
+numpy = "<2.0"
 
 [dev-packages]
 black = "*"
 pylint = "*"
+pytest = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.10"
