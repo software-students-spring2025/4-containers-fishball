@@ -1,4 +1,4 @@
-name: lint-free
+lint.yml, what should it be name: lint-free
 on: [push, pull_request]
 
 jobs:
