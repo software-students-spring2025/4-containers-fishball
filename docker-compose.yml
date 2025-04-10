@@ -22,7 +22,7 @@ services:
   web-app:
     build: ./web-app
     ports:
-      - "5001:5001"
+      - "5001:5000"
     depends_on:
       - mongodb
     environment:
