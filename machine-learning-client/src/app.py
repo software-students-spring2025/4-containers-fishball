@@ -23,11 +23,13 @@ fs = gridfs.GridFS(db)
 collection = db[COLLECTION]
 analyzer = FER()
 
+
 def analyze_image(image_bytes):
     """Run FER analysis on an image and return detected emotions."""
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     result = analyzer.detect_emotions(image)
     return result
+
 
 def process_pending_images():
     """Find unprocessed images in the DB, analyze, and update."""
@@ -43,12 +45,12 @@ def process_pending_images():
             image_bytes = fs.get(file_id).read()
             result = analyze_image(image_bytes)
             collection.update_one(
-                {"_id": doc["_id"]},
-                {"$set": {"status": "complete", "result": result}}
+                {"_id": doc["_id"]}, {"$set": {"status": "complete", "result": result}}
             )
             print(f"Analysis complete for {file_id}")
         except (NoFile, UnidentifiedImageError) as e:
             print(f"Known processing error: {e}")
+
 
 if __name__ == "__main__":
     print("Machine Learning client started. Waiting for new images...")

@@ -2,3 +2,5 @@ pymongo
 python-dotenv
 fer
 Pillow
+black
+pylint
