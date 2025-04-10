@@ -39,3 +39,15 @@ class FaceAnalyzer:
         except ValueError as e:
             logging.error("Analysis failed: %s", str(e))
             return None
+
+    def validate_config(self):
+        """
+        Validates the configuration settings.
+
+        Returns:
+            bool: True if the configuration is valid, False otherwise.
+        """
+        if not self.config.DEEPFACE_MODELS or not self.config.DEEPFACE_BACKEND:
+            logging.error("Invalid configuration: Missing required settings.")
+            return False
+        return True
