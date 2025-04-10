@@ -1,6 +1,6 @@
 """
 Module for uploading images, processing them with an ML client, and storing results in MongoDB.
-This Flask application handles image uploads, 
+This Flask application handles image uploads,
 processes images with an ML client, and retrieves stored images.
 """
 
@@ -111,11 +111,9 @@ def index():
 
 
 @app.route("/uploads/<image_id>")
-
-
 def get_image(image_id):
     """
-    Retrieves an image from the MongoDB collection by its document ID 
+    Retrieves an image from the MongoDB collection by its document ID
     and returns it as a file.
     """
     try:
