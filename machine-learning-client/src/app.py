@@ -1,11 +1,15 @@
+"""Machine learning client that detects emotions using FER and MongoDB."""
+
+import io
 import os
 import time
-import io
+
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from fer import FER
 import gridfs
+from gridfs.errors import NoFile
 
 load_dotenv()
 
@@ -43,8 +47,8 @@ def process_pending_images():
                 {"$set": {"status": "complete", "result": result}}
             )
             print(f"Analysis complete for {file_id}")
-        except Exception as e:
-            print(f"Error processing {file_id}: {e}")
+        except (NoFile, UnidentifiedImageError) as e:
+            print(f"Known processing error: {e}")
 
 if __name__ == "__main__":
     print("Machine Learning client started. Waiting for new images...")
