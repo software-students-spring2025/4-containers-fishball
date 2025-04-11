@@ -48,7 +48,7 @@ Users can register and log in to the web-app, then upload an image through the u
 - MongoDB runs on port 27017
   - Root username: `root`
   - Root password: `example`
-- Web app runs on port 5000
+- Web app runs on port 5001
 - ML client runs as a background service
 
 ## Initial Data
