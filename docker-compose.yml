@@ -21,8 +21,10 @@ services:
 
   web-app:
     build: ./web-app
+    env_file:
+      - .env
     ports:
-      - "5001:5000"
+      - "5001:5002"
     depends_on:
       - mongodb
     environment:

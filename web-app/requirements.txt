@@ -2,3 +2,7 @@ flask
 pymongo
 Pillow
 python-dotenv==0.16.0
+requests
+black
+pylint
+python-dotenv
