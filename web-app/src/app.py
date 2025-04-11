@@ -34,7 +34,6 @@ client = MongoClient(MONGO_URI)
 db = client[MONGO_DBNAME]
 images_collection = db.images
 
-
 @app.route("/", methods=["GET", "POST"])
 def index():
     """
@@ -48,23 +47,34 @@ def index():
     On a GET request, retrieves and renders all stored images.
     """
     if request.method == "POST":
-        # Check if the request has an "image" file
-        if "image" not in request.files:
-            flash("No file part in the request!")
-            return redirect(request.url)
-
         file = request.files["image"]
+        captured_image = request.form.get("captured_image", "")
+        
+        # Check if neither a file was uploaded nor a captured image provided
+        if (not file or file.filename == "") and not captured_image:
+            flash("No file selected!")
+            return redirect(request.url)
 
         if file.filename == "":
             flash("No file selected!")
             return redirect(request.url)
 
         try:
-            # Use PIL to open the image and verify it's a valid image
-            im = Image.open(file)
+            # If a file is uploaded via file input, use that.
+            if file and file.filename != "":
+                im = Image.open(file)
+            else:
+                # Otherwise, process the captured image (data URL format)
+                # captured_image is expected to be like "data:image/jpeg;base64,..."
+                header, encoded = captured_image.split(",", 1)
+                image_data = base64.b64decode(encoded)
+                im = Image.open(io.BytesIO(image_data))
         except (UnidentifiedImageError, OSError):
             flash("Invalid image format!")
             return redirect(request.url)
+        
+        if im.mode in ("RGBA", "LA"):
+            im = im.convert("RGB")
 
         # Save the image to an in-memory buffer as JPEG
         image_bytes = io.BytesIO()

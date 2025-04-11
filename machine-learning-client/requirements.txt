@@ -9,3 +9,4 @@ tf_keras
 Pillow
 black
 pylint
+numpy<2.0
