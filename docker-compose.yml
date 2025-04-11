@@ -17,7 +17,7 @@ services:
     depends_on:
       - mongodb
     environment:
-      - MONGO_URI: ${MONGO_URI}
+      MONGO_URI: ${MONGO_URI}
 
   web-app:
     build: ./web-app

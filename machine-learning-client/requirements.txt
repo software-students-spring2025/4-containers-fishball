@@ -8,3 +8,4 @@ python-multipart==0.0.6
 Pillow
 black
 pylint
+numpy<2.0
