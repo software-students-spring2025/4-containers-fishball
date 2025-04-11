@@ -16,4 +16,4 @@ COPY src/ .
 # Download DeepFace models during build (optional)
 RUN python -c "from deepface import DeepFace; DeepFace.build_model('Facenet')"
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--timeout", "120", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5002", "--timeout", "120", "app:app"]

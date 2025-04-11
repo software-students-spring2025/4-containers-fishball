@@ -17,7 +17,7 @@ analyzer = FaceAnalyzer()
 database = DBHandler()
 
 
-@app.route("/analyze", methods=["POST"])
+@app.route("/", methods=["POST"])
 def analyze():
     """
     Endpoint to analyze an uploaded image for faces.
