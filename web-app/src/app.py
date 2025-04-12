@@ -103,21 +103,32 @@ def index():
 
         print(prediction, flush=True)
         # Build the image document for MongoDB, including prediction result
-        image_doc = {
-            "filename": file.filename,
+        result = images_collection.insert_one({
+            "filename": file.filename if file else "captured.jpg",
             "data": img_data,
             "content_type": "image/jpeg",
             "upload_date": datetime.utcnow(),
             "prediction": prediction,
-        }
+        })
+        new_id = str(result.inserted_id)
 
         # Insert the image document into the MongoDB collection
-        images_collection.insert_one(image_doc)
         flash("Image uploaded and processed successfully!")
-        return redirect(url_for("index"))
+        return redirect(url_for("index", uploaded=new_id))
 
-    # For GET requests, retrieve all images from the database
-    files = list(images_collection.find())
+    # For GET requests, check if we have an "uploaded" query parameter
+    uploaded_id = request.args.get("uploaded")
+    if uploaded_id:
+        try:
+            file_doc = images_collection.find_one({"_id": ObjectId(uploaded_id)})
+            files = [file_doc] if file_doc is not None else []
+        except (InvalidId, PyMongoError) as err:
+            flash(f"Error retrieving image: {err}")
+            files = []
+    else:
+        # Optionally, if no uploaded parameter is present, show nothing or a default message.
+        files = []
+    
     return render_template("index.html", files=files)
 
 

@@ -58,6 +58,53 @@
 
     <canvas id="canvas"></canvas>
 
+    {% if files %}
+      <h2>Uploaded Images &amp; Analysis Results</h2>
+      <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+        {% for file in files %}
+          {% if file %}
+            <div class="result-container">
+              <!-- Display the uploaded image -->
+              <img 
+                src="{{ url_for('get_image', image_id=file._id) }}" 
+                alt="Uploaded Image" 
+                style="width: 100%;"
+              >
+              <p><strong>Uploaded:</strong> {{ file.upload_date.strftime("%Y-%m-%d %H:%M:%S") }}</p>
+              
+              <!-- If prediction is an error message (string), show it directly -->
+              {% if file.prediction is string and 'Error' in file.prediction %}
+                <p style="color: red;"><strong>Prediction:</strong> {{ file.prediction }}</p>
+
+              <!-- If it's a list/dict of face analyses, display them nicely -->
+              {% elif file.prediction is sequence %}
+                <h4>Face Analysis & Prediction:</h4>
+                {% for face in file.prediction %}
+                  <div style="text-align: left;">
+                    <p><strong>Age:</strong> {{ face.age }}</p>
+                    <p><strong>Dominant Gender:</strong> {{ face.dominant_gender }}</p>
+                    <p><strong>Dominant Emotion:</strong> {{ face.dominant_emotion }}</p>
+                    
+                    <!-- Show all emotions in a small list -->
+                    <strong>Emotions:</strong>
+                    <ul>
+                      {% for emotion, score in face.emotion.items() %}
+                        <li>{{ emotion }}: {{ score | round(2) }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                  <hr>
+                {% endfor %}
+              {% else %}
+                <!-- If the structure is something else, just display it -->
+                <p><strong>Prediction:</strong> {{ file.prediction }}</p>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
     <script>
       const startCameraBtn = document.getElementById('startCamera');
       const captureBtn = document.getElementById('captureButton');
