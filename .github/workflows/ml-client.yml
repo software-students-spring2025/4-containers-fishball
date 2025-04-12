@@ -40,3 +40,6 @@ jobs:
 
       - name: Check formatting with black
         run: black --check src/
+
+      - name: Run tests
+        run: pytest --cov=src --cov-report=term-missing
