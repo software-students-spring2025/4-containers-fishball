@@ -95,12 +95,13 @@ def index():
             # Send the image data to the ML client
             ml_response = requests.post(ML_CLIENT_URL, json=payload, timeout=30)
             ml_response.raise_for_status()  # Raises an exception if the response is not 200
-            prediction = ml_response.json().get("result", "No result")
+            prediction = ml_response.json().get("results", "No result")
         except requests.RequestException as req_err:
             prediction = f"Error during prediction: {req_err}"
         except ValueError as val_err:
             prediction = f"Error decoding ML response: {val_err}"
 
+        print(prediction, flush=True)
         # Build the image document for MongoDB, including prediction result
         image_doc = {
             "filename": file.filename,
@@ -149,4 +150,4 @@ def get_image(image_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5002, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)

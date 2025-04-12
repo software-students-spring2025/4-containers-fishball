@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mongodb:
     image: mongo:latest
@@ -7,6 +5,8 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    environment:
+      MONGO_URI: ${MONGO_URI}
 
   machine-learning-client:
     build: ./machine-learning-client
@@ -24,11 +24,11 @@ services:
     env_file:
       - .env
     ports:
-      - "5001:5002"
+      - "5001:5001"
     depends_on:
       - mongodb
     environment:
-      MONGO_URI: "mongodb://root:example@mongodb:27017"
+      MONGO_URI: ${MONGO_URI}
     volumes:
       - ./web-app/src:/app
 
