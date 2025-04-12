@@ -48,4 +48,4 @@ jobs:
         run: black --check src/
 
       - name: Run tests
-        run: pytest --maxfail=1 --disable-warnings -q
+        run: pytest --cov=src --cov-report=term-missing

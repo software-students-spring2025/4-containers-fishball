@@ -34,6 +34,85 @@ client = MongoClient(MONGO_URI)
 db = client[MONGO_DBNAME]
 images_collection = db.images
 
+
+def load_image_from_request():
+    """
+    Processes the incoming request to load an image either from the uploaded file field
+    or from a base64-encoded captured image.
+    Returns a tuple (image, filename) or (None, None) on error.
+    """
+    file_obj = request.files.get("image")
+    captured = request.form.get("captured_image", "")
+
+    if file_obj and file_obj.filename:
+        try:
+            image = Image.open(file_obj)
+        except (UnidentifiedImageError, OSError):
+            flash("Invalid image format!")
+            return None, None
+        return image, file_obj.filename
+
+    if captured:
+        try:
+            parts = captured.split(",", 1)
+            if len(parts) != 2:
+                flash("Invalid captured image data!")
+                return None, None
+            encoded = parts[1]
+            image_data = base64.b64decode(encoded)
+            image = Image.open(io.BytesIO(image_data))
+        except (UnidentifiedImageError, OSError, ValueError):
+            flash("Invalid captured image format!")
+            return None, None
+        return image, "captured.jpg"
+
+    flash("No file selected!")
+    return None, None
+
+
+def process_upload(image_obj, filename):
+    """
+    Converts the image to JPEG, checks its size, sends it to the ML client,
+    and stores the image and prediction in MongoDB.
+    Returns the inserted document's ID as a string.
+    """
+    if image_obj.mode in ("RGBA", "LA"):
+        image_obj = image_obj.convert("RGB")
+
+    image_bytes = io.BytesIO()
+    image_obj.save(image_bytes, format="JPEG")
+    img_data = image_bytes.getvalue()
+
+    if len(img_data) > MAX_IMAGE_SIZE:
+        flash("Uploaded image exceeds 16MB and cannot be stored!")
+        return None
+
+    image_b64 = base64.b64encode(img_data).decode("utf-8")
+    payload = {"image": f"data:image/jpeg;base64,{image_b64}"}
+
+    try:
+        ml_response = requests.post(ML_CLIENT_URL, json=payload, timeout=30)
+        ml_response.raise_for_status()
+        prediction = ml_response.json().get("results", "No result")
+    except requests.RequestException as req_err:
+        prediction = f"Error during prediction: {req_err}"
+    except ValueError:
+        prediction = "Error decoding ML response"
+
+    print(prediction, flush=True)
+
+    result = images_collection.insert_one(
+        {
+            "filename": filename,
+            "data": img_data,
+            "content_type": "image/jpeg",
+            "upload_date": datetime.utcnow(),
+            "prediction": prediction,
+        }
+    )
+    return str(result.inserted_id)
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     """
@@ -47,77 +126,28 @@ def index():
     On a GET request, retrieves and renders all stored images.
     """
     if request.method == "POST":
-        file = request.files["image"]
-        captured_image = request.form.get("captured_image", "")
-        
-        # Check if neither a file was uploaded nor a captured image provided
-        if (not file or file.filename == "") and not captured_image:
-            flash("No file selected!")
+        image_obj, filename = load_image_from_request()
+        if image_obj is None:
+            return redirect(request.url)
+        new_id = process_upload(image_obj, filename)
+        if new_id is None:
             return redirect(request.url)
 
-        if file.filename == "":
-            flash("No file selected!")
-            return redirect(request.url)
-
-        try:
-            # If a file is uploaded via file input, use that.
-            if file and file.filename != "":
-                im = Image.open(file)
-            else:
-                # Otherwise, process the captured image (data URL format)
-                # captured_image is expected to be like "data:image/jpeg;base64,..."
-                header, encoded = captured_image.split(",", 1)
-                image_data = base64.b64decode(encoded)
-                im = Image.open(io.BytesIO(image_data))
-        except (UnidentifiedImageError, OSError):
-            flash("Invalid image format!")
-            return redirect(request.url)
-        
-        if im.mode in ("RGBA", "LA"):
-            im = im.convert("RGB")
-
-        # Save the image to an in-memory buffer as JPEG
-        image_bytes = io.BytesIO()
-        im.save(image_bytes, format="JPEG")
-        img_data = image_bytes.getvalue()
-
-        # Check if the image size exceeds the 16MB limit
-        if len(img_data) > MAX_IMAGE_SIZE:
-            flash("Uploaded image exceeds 16MB and cannot be stored!")
-            return redirect(request.url)
-
-        # Prepare the image for ML client processing by encoding it in base64.
-        # The ML client may expect a data URL format: "data:image/jpeg;base64,...."
-        image_b64 = base64.b64encode(img_data).decode("utf-8")
-        payload = {"image": f"data:image/jpeg;base64,{image_b64}"}
-
-        try:
-            # Send the image data to the ML client
-            ml_response = requests.post(ML_CLIENT_URL, json=payload, timeout=30)
-            ml_response.raise_for_status()  # Raises an exception if the response is not 200
-            prediction = ml_response.json().get("results", "No result")
-        except requests.RequestException as req_err:
-            prediction = f"Error during prediction: {req_err}"
-        except ValueError as val_err:
-            prediction = f"Error decoding ML response: {val_err}"
-
-        print(prediction, flush=True)
-        # Build the image document for MongoDB, including prediction result
-        image_doc = {
-            "filename": file.filename,
-            "data": img_data,
-            "content_type": "image/jpeg",
-            "upload_date": datetime.utcnow(),
-            "prediction": prediction,
-        }
-
-        # Insert the image document into the MongoDB collection
-        images_collection.insert_one(image_doc)
         flash("Image uploaded and processed successfully!")
-        return redirect(url_for("index"))
+        return redirect(url_for("index", uploaded=new_id))
 
-    # For GET requests, retrieve all images from the database
-    files = list(images_collection.find())
+    # For GET requests: retrieve only the newly uploaded document if provided.
+    uploaded_id = request.args.get("uploaded")
+    if uploaded_id:
+        try:
+            file_doc = images_collection.find_one({"_id": ObjectId(uploaded_id)})
+            files = [file_doc] if file_doc is not None else []
+        except (InvalidId, PyMongoError) as err:
+            flash(f"Error retrieving image: {err}")
+            files = []
+    else:
+        files = []
+
     return render_template("index.html", files=files)
 
 

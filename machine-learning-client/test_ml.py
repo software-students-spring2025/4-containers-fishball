@@ -13,6 +13,7 @@ from src.app import app
 from src.db_handler import DBHandler
 from src.face_analyzer import FaceAnalyzer
 
+
 # ----------------------
 # Test face_analyzer.py
 # ----------------------
@@ -47,6 +48,7 @@ class TestFaceAnalyzer:
         result = analyzer.analyze("fake.jpg")
         assert result is None
 
+
 # ----------------------
 # Test db_handler.py
 # ----------------------
@@ -79,14 +81,17 @@ class TestDbHandler:
         result = db.get_analysis("abc123")
         assert result == {"analysis_id": "abc123"}
 
+
 # ----------------------
 # Test app.py (Flask API)
 # ----------------------
+
 
 class TestApp:
     """
     Test suite for the Flask API endpoints in app.py.
     """
+
     @patch("src.app.database.store_analysis", return_value=None)
     def test_analyze_no_file(self):
         """
@@ -102,14 +107,17 @@ class TestApp:
         Test that the analyze endpoint successfully processes and stores analysis data.
         """
         with app.test_client() as client:
-            data = {
-                "file": (io.BytesIO(b"fake image data"), "test.jpg")
-            }
-            response = client.post("/analyze", data=data, content_type="multipart/form-data")
+            data = {"file": (io.BytesIO(b"fake image data"), "test.jpg")}
+            response = client.post(
+                "/analyze", data=data, content_type="multipart/form-data"
+            )
             assert response.status_code == 200
             assert "analysis_id" in response.get_json()
 
-    @patch("src.app.database.get_analysis", return_value={"analysis_id": "abc123", "results": {}})
+    @patch(
+        "src.app.database.get_analysis",
+        return_value={"analysis_id": "abc123", "results": {}},
+    )
     def test_get_analysis_found(self):
         """
         Test that the get_analysis endpoint returns the correct analysis when found.
