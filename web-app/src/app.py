@@ -101,13 +101,15 @@ def process_upload(image_obj, filename):
 
     print(prediction, flush=True)
 
-    result = images_collection.insert_one({
-        "filename": filename,
-        "data": img_data,
-        "content_type": "image/jpeg",
-        "upload_date": datetime.utcnow(),
-        "prediction": prediction,
-    })
+    result = images_collection.insert_one(
+        {
+            "filename": filename,
+            "data": img_data,
+            "content_type": "image/jpeg",
+            "upload_date": datetime.utcnow(),
+            "prediction": prediction,
+        }
+    )
     return str(result.inserted_id)
 
 
@@ -147,6 +149,7 @@ def index():
         files = []
 
     return render_template("index.html", files=files)
+
 
 @app.route("/uploads/<image_id>")
 def get_image(image_id):
