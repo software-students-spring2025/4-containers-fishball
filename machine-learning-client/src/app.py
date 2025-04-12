@@ -3,6 +3,7 @@ This module provides a Flask application for analyzing images for faces
 and retrieving analysis results from a database.
 """
 
+import base64
 import os
 import uuid
 from flask import Flask, request, jsonify
@@ -23,23 +24,44 @@ def analyze():
     Endpoint to analyze an uploaded image for faces.
     Returns the analysis results or an error message.
     """
-    if "file" not in request.files:
+    if not request.is_json:
+        return jsonify({"error": "Request must be JSON"}), 400
+
+    data = request.get_json()
+
+    # Check if image data exists
+    if "image" not in data:
         return jsonify({"error": "No file provided"}), 400
 
-    file = request.files["file"]
-    if not file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
-        return jsonify({"error": "Invalid file type"}), 400
-
-    temp_path = f"/tmp/{uuid.uuid4()}{os.path.splitext(file.filename)[1]}"
-    file.save(temp_path)
+    image_data = data["image"]
 
     try:
+        # Extract the actual base64 string
+        header, base64_str = image_data.split(",", 1)
+
+        # Determine file extension from header
+        if "jpeg" in header:
+            ext = ".jpg"
+        elif "png" in header:
+            ext = ".png"
+        else:
+            return jsonify({"error": "Unsupported image type"}), 400
+
+        # Decode and save temporarily
+        temp_path = f"/tmp/{uuid.uuid4()}{ext}"
+        with open(temp_path, "wb") as f:
+            f.write(base64.b64decode(base64_str))
+
+        # Analyze the image
         results = analyzer.analyze(temp_path)
         if not results:
+            os.remove(temp_path)
             return jsonify({"error": "No faces detected"}), 400
 
+        # Store results
         analysis_id = database.store_analysis(temp_path, results)
-        os.remove(temp_path)
+        # os.remove(temp_path)
+
         return (
             jsonify(
                 {
@@ -51,13 +73,8 @@ def analyze():
             200,
         )
 
-    except (OSError, ValueError) as e:
-        os.remove(temp_path)
-        return jsonify({"error": str(e)}), 400
-    except RuntimeError as e:  # Fallback for unexpected runtime errors
-        os.remove(temp_path)
-        app.logger.error("Unexpected error: %s", e)
-        return jsonify({"error": "An unexpected error occurred"}), 500
+    except base64.binascii.Error:
+        return jsonify({"error": "Invalid base64 encoding"}), 400
 
 
 @app.route("/analysis/<analysis_id>", methods=["GET"])
