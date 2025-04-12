@@ -51,26 +51,22 @@ def index():
         captured_image = request.form.get("captured_image", "")
         
         # Check if neither a file was uploaded nor a captured image provided
-        if (not file or file.filename == "") and not captured_image:
-            flash("No file selected!")
-            return redirect(request.url)
-
-        if file.filename == "":
-            flash("No file selected!")
-            return redirect(request.url)
-
-        try:
-            # If a file is uploaded via file input, use that.
-            if file and file.filename != "":
+        if file and file.filename:
+            try:
                 im = Image.open(file)
-            else:
-                # Otherwise, process the captured image (data URL format)
-                # captured_image is expected to be like "data:image/jpeg;base64,..."
+            except (UnidentifiedImageError, OSError):
+                flash("Invalid image format!")
+                return redirect(request.url)
+        elif captured_image:
+            try:
                 header, encoded = captured_image.split(",", 1)
                 image_data = base64.b64decode(encoded)
                 im = Image.open(io.BytesIO(image_data))
-        except (UnidentifiedImageError, OSError):
-            flash("Invalid image format!")
+            except (UnidentifiedImageError, OSError, ValueError) as e:
+                flash("Invalid captured image format!")
+                return redirect(request.url)
+        else:
+            flash("No file selected!")
             return redirect(request.url)
         
         if im.mode in ("RGBA", "LA"):
