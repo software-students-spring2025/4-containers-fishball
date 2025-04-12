@@ -28,7 +28,7 @@ services:
     depends_on:
       - mongodb
     environment:
-      MONGO_URI: "mongodb://root:example@mongodb:27017"
+      MONGO_URI: ${MONGO_URI}
     volumes:
       - ./web-app/src:/app
 
