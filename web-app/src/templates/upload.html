@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Image Upload</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+      }
+      form {
+        margin-top: 20px;
+      }
+      .flashes {
+        color: red;
+        list-style: none;
+        padding: 0;
+      }
+      .result-container {
+        margin-top: 20px;
+        text-align: left;
+      }
+      .result-container img {
+        width: 100%;
+        border: 1px solid #ccc;
+      }
+      .nav-link {
+        display: inline-block;
+        margin-top: 20px;
+        font-size: 1.1em;
+        text-decoration: none;
+        color: #3498db;
+      }
+      .nav-link:hover {
+        color: #2980b9;
+      }
+    </style>
+  </head>
+  <body>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <h1>Upload Image</h1>
+    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+      <div>
+        <input type="file" name="image" accept="image/*" />
+      </div>
+      <br>
+      <button type="submit">Upload</button>
+    </form>
+
+    {% if files %}
+      <h2>Uploaded Images &amp; Analysis Results</h2>
+      <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+        {% for file in files %}
+          {% if file %}
+            <div class="result-container">
+              <!-- Display the uploaded image -->
+              <img src="{{ url_for('get_image', image_id=file._id) }}" alt="Uploaded Image">
+              <p><strong>Uploaded:</strong> {{ file.upload_date.strftime("%Y-%m-%d %H:%M:%S") }}</p>
+              
+              <!-- If prediction is an error message string, show it directly -->
+              {% if file.prediction is string and 'Error' in file.prediction %}
+                <p style="color: red;"><strong>Prediction:</strong> {{ file.prediction }}</p>
+              
+              <!-- If prediction is a list/dict of face analyses, display them nicely -->
+              {% elif file.prediction is sequence %}
+                <h4>Face Analysis &amp; Prediction:</h4>
+                {% for face in file.prediction %}
+                  <div style="text-align: left; margin-bottom:10px;">
+                    <p><strong>Age:</strong> {{ face.age }}</p>
+                    <p><strong>Dominant Gender:</strong> {{ face.dominant_gender }}</p>
+                    <p><strong>Dominant Emotion:</strong> {{ face.dominant_emotion }}</p>
+                    <strong>Emotions:</strong>
+                    <ul>
+                      {% for emotion, score in face.emotion.items() %}
+                        <li>{{ emotion }}: {{ score | round(2) }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                  <hr>
+                {% endfor %}
+              {% else %}
+                <!-- For any other data types, just display the prediction -->
+                <p><strong>Prediction:</strong> {{ file.prediction }}</p>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    <!-- Navigation link to go to the camera capture page -->
+    <p>
+      Or <a href="{{ url_for('camera') }}" class="nav-link">Capture Image from Camera</a>
+    </p>
+  </body>
+</html>
