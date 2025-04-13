@@ -42,6 +42,7 @@ Users can enter the web-app, then upload an image through the upload feature or 
 1. Install Docker and Docker Compose
 2. Clone this repository
 3. Run `docker-compose up --build`
+4. Go to http://localhost:5001
 
 ## Configuration
 
