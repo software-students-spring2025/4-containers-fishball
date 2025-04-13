@@ -8,6 +8,8 @@ Build a containerized app that uses machine learning. See [instructions](./instr
 
 ## Introduction
 
+This project is a facial analysis web application!
+
 In this project, we have three Docker containers: MongoDB, machine-learning-client, and web-app. The system allows users to upload images or capture photos using their webcam, analyze facial emotions, and view face-related statistics based on their uploads.
 
 Users can enter the web-app, then upload an image through the upload feature or take a live photo using their webcam. The machine-learning-client then analyzes the image using a facial emotion recognition model and returns the detected emotions to the user. After that, users can view the results of the emotion analysis on their main page.
