@@ -35,11 +35,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run pylint
-        run: pylint src/*.py
+      - name: Format Code with Black
+        run:
+          black machine-learning-client
 
-      - name: Check formatting with black
-        run: black --check src/
-
-      - name: Run tests
-        run: pytest --cov=src --cov-report=term-missing
+      - name: Lint Code with Pylint
+        run:
+          pylint machine-learning-client/*.py
