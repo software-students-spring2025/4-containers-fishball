@@ -31,14 +31,17 @@ class DBHandler:
         Returns:
             ObjectId: The ID of the inserted document.
         """
+        analysis_id = str(uuid.uuid4())
         doc = {
-            "analysis_id": str(uuid.uuid4()),
+            "analysis_id": analysis_id,
             "image_path": image_path,
             "results": results,
             "models": Config.DEEPFACE_MODELS,
             "timestamp": datetime.now(timezone.utc),
         }
-        return self.database.analyses.insert_one(doc).inserted_id
+        # Perform the insertion but ignore the ObjectId returned by insert_one
+        self.database.analyses.insert_one(doc)
+        return analysis_id
 
     def get_analysis(self, analysis_id):
         """
