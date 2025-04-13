@@ -36,6 +36,7 @@ body {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     padding: 40px 30px;
     margin-top: 50px;
+    margin-bottom: 50px;
     width: 100%;
     max-width: 500px;
     text-align: center;
@@ -58,9 +59,9 @@ body {
 video {
     width: 320px;
     height: 240px;
-    border: 1px solid #ccc;
     margin-top: 10px;
     display: none;
+    align-items: center;
 }
 
 canvas {
@@ -72,7 +73,7 @@ form {
 }
 
 .flashes {
-    color: red;
+    color: #00ff95cb;
     list-style: none;
     padding: 0;
 }
@@ -109,23 +110,22 @@ button, .button, input[type="file"]::file-selector-button {
     font-size: 1em;
     cursor: pointer;
     transition: background-color 0.3s ease;
-  }
+}
   
-  button:hover, .button:hover, input[type="file"]::file-selector-button:hover {
+button:hover, .button:hover, input[type="file"]::file-selector-button:hover {
     background-color: white;
     color: #222222;
-    transform: translateY(-2px);
-  }
-  
-  /* File input */
-  input[type="file"] {
+}
+
+/* File input */
+input[type="file"] {
     display: block;
     margin: 0 auto 20px;
     padding: 10px;
-  }
-  
-  /* Image preview */
-  .preview-box {
+}
+
+/* Image preview */
+.preview-box {
     background-color: #f0f0f0;
     border-radius: 12px;
     height: 200px;
@@ -133,18 +133,106 @@ button, .button, input[type="file"]::file-selector-button {
     align-items: center;
     justify-content: center;
     margin-bottom: 20px;
-  }
-  
-  /* Uploaded results */
-  .results-section {
-    background-color: #ffffff;
+}
+
+/* Uploaded results */
+.results-section {
     margin-top: 40px;
+    margin-bottom: 40px;
     padding: 30px 20px;
     border-radius: 20px;
     text-align: center;
+}
+
+.results-section h2 {
+    font-size: 1.8em;
+    color: #ffffff;
+}
+
+.camera-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px; /* space between video and button */
+    margin-top: 20px;
+}
+
+#video {
+    border-radius: 12px;
+    max-width: 320px;
+    height: auto;
+    background-color: black;
+    align-items: center;
+}
+
+.capture-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.capture-button {
+    background: rgba(0, 0, 0, 0.1);
+    color: white;
+    border: none;
+    width: 60px;       
+    height: 60px;      
+    padding: 0;        
+    border-radius: 50%;
+    font-size: 1.8em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.capture-button:hover {
+    background-color: white;
+    color: #222222;
+}
+
+.capture-message {
+    margin-top: 20px;
+    color: #00ff95cb; /* greenish success text */
+    font-size: 1.1em;
+}
+
+.video-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+.upload-options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px; /* spacing between input, OR text, and button */
+    margin-top: 20px;
+}
+
+.custom-file-upload {
+    background: rgba(0, 0, 0, 0.1);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
   }
   
-  .results-section h2 {
-    font-size: 1.8em;
-    color: #2c3e50;
+  .custom-file-upload:hover {
+    background-color: white;
+    color: #222222;;
   }
+  
+  /* Hide the ugly real file input */
+  .custom-file-upload input[type="file"] {
+    display: none;
+  }
+  
+  .upload-options #fileName {
+    margin-left: 0px;
+    text-align: left;
+    font-size: 0.8em;
+    color: white;
+  }
+  

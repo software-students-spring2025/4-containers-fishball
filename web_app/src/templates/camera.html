@@ -14,21 +14,24 @@
 
     <h1>Capture Image from Camera</h1>
     <form id="cameraForm" action="/camera" method="post">
-      <div>
-        <button type="button" id="startCamera">Open Camera</button>
-        <button type="button" id="captureButton" style="display:none;">Capture Photo</button>
+      <div class="camera-section">
+        <video id="video" autoplay></video>
+
+        <!--button type="button" id="startCamera">Open Camera</button-->
+        <div class="capture-controls">
+          <button id="captureButton" type="button" class="capture-button">📷</button>
+        </div>
       </div>
-      <br>
-      <video id="video" autoplay></video>
-      <br>
+
       <!-- Hidden input to store the captured image as a base64 string -->
       <input type="hidden" name="captured_image" id="captured_image" />
       <button type="submit">Upload Captured Image</button>
     </form>
 
-    <canvas id="canvas"></canvas>
+    <p id="captureMessage" class="capture-message"></p>
 
     {% if files %}
+      <div class="results-section"></div>
       <h2>Captured Images &amp; Analysis Results</h2>
       <div style="display: flex; flex-wrap: wrap; justify-content: center;">
         {% for file in files %}
@@ -67,6 +70,7 @@
           {% endif %}
         {% endfor %}
       </div>
+      </div>
     {% endif %}
 
     <!-- Navigation link to go to the file upload page -->
@@ -74,38 +78,38 @@
       Or <a href="{{ url_for('upload') }}" class="nav-link">Upload Image from File</a>
     </p>
 
-    <script>
-      const startCameraBtn = document.getElementById('startCamera');
-      const captureBtn = document.getElementById('captureButton');
-      const video = document.getElementById('video');
-      const canvas = document.getElementById('canvas');
-      const capturedImageInput = document.getElementById('captured_image');
 
-      startCameraBtn.addEventListener('click', async () => {
-        try {
-          // Request access to the camera
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-          video.srcObject = stream;
-          video.style.display = 'block';
-          captureBtn.style.display = 'inline';
-        } catch (err) {
-          alert('Error accessing camera: ' + err);
-        }
-      });
+  <script>
+    const startCameraBtn = document.getElementById('startCamera');
+    const captureBtn = document.getElementById('captureButton');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const capturedImageInput = document.getElementById('captured_image');
 
-      captureBtn.addEventListener('click', () => {
-        // Set canvas dimensions to match the video stream
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const context = canvas.getContext('2d');
-        // Draw the current video frame to the canvas
-        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-        // Convert the canvas image to a base64-encoded JPEG string
-        const dataURL = canvas.toDataURL('image/jpeg');
-        capturedImageInput.value = dataURL;
-        alert('Photo captured. It will be uploaded along with your form data.');
-      });
-    </script>
+    startCameraBtn.addEventListener('click', async () => {
+      try {
+        // Request access to the camera
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.style.display = 'block';
+        captureBtn.style.display = 'inline';
+      } catch (err) {
+        alert('Error accessing camera: ' + err);
+      }
+    });
 
+    captureBtn.addEventListener('click', () => {
+      // Set canvas dimensions to match the video stream
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext('2d');
+      // Draw the current video frame to the canvas
+      context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+      // Convert the canvas image to a base64-encoded JPEG string
+      const dataURL = canvas.toDataURL('image/jpeg');
+      capturedImageInput.value = dataURL;
+      captureMessage.textContent = "Photo captured! Ready to upload.";
+    });
+  </script>
 
 {% endblock %}

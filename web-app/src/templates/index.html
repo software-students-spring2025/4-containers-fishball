@@ -15,18 +15,27 @@
     <!-- A simple form with file input and camera capture functionality -->
     <form id="uploadForm" action="/" method="post" enctype="multipart/form-data">
       <!-- Option 1: Select an image from file -->
-      <div>
-        <input type="file" name="image" accept="image/*" />
+      <div class="upload-options">
+        <label class="custom-file-upload">
+          <input type="file" name="image" accept="image/*" id="fileInput" />
+          Choose File
+        </label>
+        <span id="fileName">No file chosen</span>
+
+        <p>OR</p>
+        <div>
+          <button type="button" id="startCamera">Open Camera</button>
+        </div>
       </div>
-      <hr style="margin: 20px 0;">
-      <!-- Option 2: Capture a photo using the camera -->
-      <div>
-        <button type="button" id="startCamera">Open Camera</button>
-        <button type="button" id="captureButton" style="display:none;">Capture Photo</button>
-      </div>
-      <div>
+      <div class="video-wrapper">
         <video id="video" autoplay style="display:none;"></video>
       </div>
+      <div class="capture-controls">
+        <button id="captureButton" type="button" class="capture-button" style="display:none;">📷</button>
+      </div>
+
+      <p id="captureMessage" class="capture-message"></p>
+
       <!-- Hidden input to store the captured image as base64 -->
       <input type="hidden" name="captured_image" id="captured_image" />
       <br>
@@ -52,13 +61,13 @@
               
               <!-- If prediction is an error message (string), show it directly -->
               {% if file.prediction is string and 'Error' in file.prediction %}
-                <p style="color: red;"><strong>Prediction:</strong> {{ file.prediction }}</p>
+                <p><strong>Prediction:</strong> I couldn't find a face in your image. Try a different one!</p>
 
               <!-- If it's a list/dict of face analyses, display them nicely -->
               {% elif file.prediction is sequence %}
                 <h4>Face Analysis & Prediction:</h4>
                 {% for face in file.prediction %}
-                  <div style="text-align: left;">
+                  <div style="text-align: center;">
                     <p><strong>Age:</strong> {{ face.age }}</p>
                     <p><strong>Dominant Gender:</strong> {{ face.dominant_gender }}</p>
                     <p><strong>Dominant Emotion:</strong> {{ face.dominant_emotion }}</p>
@@ -86,34 +95,45 @@
 
     <script>
       const startCameraBtn = document.getElementById('startCamera');
-      const captureBtn = document.getElementById('captureButton');
+      const captureButton = document.getElementById('captureButton');
       const video = document.getElementById('video');
       const canvas = document.getElementById('canvas');
       const capturedImageInput = document.getElementById('captured_image');
+      const captureMessage = document.getElementById('captureMessage');
+      const fileInput = document.getElementById('fileInput');
+      const fileName = document.getElementById('fileName');
 
+      fileInput.addEventListener('change', function() {
+        if (fileInput.files.length > 0) {
+          fileName.textContent = fileInput.files[0].name;
+        } else {
+          fileName.textContent = "No file chosen";
+        }
+      });
+  
       startCameraBtn.addEventListener('click', async () => {
         try {
           // Request access to the camera
           const stream = await navigator.mediaDevices.getUserMedia({ video: true });
           video.srcObject = stream;
           video.style.display = 'block';
-          captureBtn.style.display = 'inline';
+          captureButton.style.display = 'inline';
         } catch (err) {
           alert('Error accessing camera: ' + err);
         }
       });
-
-      captureBtn.addEventListener('click', () => {
-        // Set canvas dimensions to match video stream
+  
+      captureButton.addEventListener('click', () => {
+        // Set canvas dimensions to match the video stream
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const context = canvas.getContext('2d');
         // Draw the current video frame to the canvas
-        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
         // Convert the canvas image to a base64-encoded JPEG string
         const dataURL = canvas.toDataURL('image/jpeg');
         capturedImageInput.value = dataURL;
-        alert('Photo captured. It will be uploaded along with your form data.');
+        captureMessage.textContent = "Photo captured! Ready to upload.";
       });
     </script>
 
