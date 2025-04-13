@@ -7,13 +7,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <header>
-        <h1>Facial Analysis</h1>
-        <h3>Upload an image and we'll guess how you're feeling</h3>
-    </header>
+    <div class="container">
+        <header>
+            <h1>Welcome!</h1>
+            <h3>This is a facial analysis app. Upload an image and we'll guess how you're feeling</h3>
+        </header>
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
 </body>
 </html>

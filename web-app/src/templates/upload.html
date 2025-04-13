@@ -22,6 +22,7 @@
     </form>
 
     {% if files %}
+    <div class="results-section">
       <h2>Uploaded Images &amp; Analysis Results</h2>
       <div style="display: flex; flex-wrap: wrap; justify-content: center;">
         {% for file in files %}
@@ -60,6 +61,7 @@
           {% endif %}
         {% endfor %}
       </div>
+    </div>
     {% endif %}
     
     <!-- Navigation link to go to the camera capture page -->
@@ -67,4 +69,4 @@
       Or <a href="{{ url_for('camera') }}" class="nav-link">Capture Image from Camera</a>
     </p>
 
-    {% endblock %}
+{% endblock %}
