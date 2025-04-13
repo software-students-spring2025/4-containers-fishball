@@ -236,3 +236,120 @@ input[type="file"] {
     color: white;
   }
   
+  .results-section {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .results-section h2 {
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    color: white;
+  }
+  
+  .results-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+  }
+  
+  .result-card {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .result-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin-bottom: 15px;
+  }
+  
+  .result-details {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .result-details p {
+    margin: 8px 0;
+    font-size: 1em;
+    color: white;
+  }
+  
+  .result-details h4 {
+    margin-top: 20px;
+    font-size: 1.2em;
+    color: white;
+  }
+  
+  /* Table for age, gender, emotion */
+  .result-table {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1em;
+    color: white;
+  }
+  
+  .result-label {
+    font-weight: bold;
+    color: white;
+  }
+  
+  .result-value {
+    color: white;
+  }
+  
+  /* Emotion Breakdown as Dashboard */
+  .emotion-breakdown {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .emotion-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .emotion-label {
+    width: 80px;
+    text-align: right;
+    font-size: 0.9em;
+    color: white;
+  }
+  
+  .progress-bar {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    height: 12px;
+    flex-grow: 1;
+    overflow: hidden;
+  }
+  
+  .progress-fill {
+    background: white;
+    height: 100%;
+    border-radius: 8px 0 0 8px;
+    transition: width 2s ease;
+  }
+  
+  .emotion-score {
+    width: 40px;
+    text-align: left;
+    font-size: 0.9em;
+    color: white;
+  }
+  

@@ -47,16 +47,18 @@
     {% if files %}
     <div class="results-section">
       <h2>Uploaded Images &amp; Analysis Results</h2>
-      <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+      <div class="results-grid">
         {% for file in files %}
           {% if file %}
-            <div class="result-container">
+            <div class="result-card">
               <!-- Display the uploaded image -->
               <img 
                 src="{{ url_for('get_image', image_id=file._id) }}" 
                 alt="Uploaded Image" 
                 style="width: 100%;"
               >
+
+              <div class="result-details">
               <p><strong>Uploaded:</strong> {{ file.upload_date.strftime("%Y-%m-%d %H:%M:%S") }}</p>
               
               <!-- If prediction is an error message (string), show it directly -->
@@ -67,21 +69,34 @@
               {% elif file.prediction is sequence %}
                 <h4>Face Analysis & Prediction:</h4>
                 {% for face in file.prediction %}
-                  <div style="text-align: center;">
-                    <p><strong>Age:</strong> {{ face.age }}</p>
-                    <p><strong>Dominant Gender:</strong> {{ face.dominant_gender }}</p>
-                    <p><strong>Dominant Emotion:</strong> {{ face.dominant_emotion }}</p>
-                    
-                    <!-- Show all emotions in a small list -->
-                    <strong>Emotions:</strong>
-                    <ul>
-                      {% for emotion, score in face.emotion.items() %}
-                        <li>{{ emotion }}: {{ score | round(2) }}</li>
-                      {% endfor %}
-                    </ul>
+                <div class="result-table">
+                  <div class="result-row">
+                    <div class="result-label">Age:</div>
+                    <div class="result-value">{{ face.age }}</div>
                   </div>
-                  <hr>
-                {% endfor %}
+                  <div class="result-row">
+                    <div class="result-label">Dominant Gender:</div>
+                    <div class="result-value">{{ face.dominant_gender }}</div>
+                  </div>
+                  <div class="result-row">
+                    <div class="result-label">Dominant Emotion:</div>
+                    <div class="result-value">{{ face.dominant_emotion }}</div>
+                  </div>
+                </div>
+                <h4>Emotion Breakdown:</h4>
+                <div class="emotion-breakdown">
+                  {% for emotion, score in face.emotion.items() %}
+                  <div class="emotion-bar">
+                    <span class="emotion-label">{{ emotion }}</span>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: {{ (score | round(0)) ~ '%' }};"></div>
+                    </div>
+                    <span class="emotion-score">{{ score | round(0) }}%</span>
+                  </div>
+                  {% endfor %}
+                </div>
+              {% endfor %}
+
               {% else %}
                 <!-- If the structure is something else, just display it -->
                 <p><strong>Prediction:</strong> {{ file.prediction }}</p>
