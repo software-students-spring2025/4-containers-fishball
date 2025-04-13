@@ -35,7 +35,6 @@ db = client[MONGO_DBNAME]
 images_collection = db.images
 
 
-
 def load_image_from_file():
     """
     Loads an image from the uploaded file and returns (image, filename).
@@ -117,6 +116,7 @@ def process_upload(image_obj, filename):
         }
     )
     return str(result.inserted_id)
+
 
 @app.route("/")
 def home():
