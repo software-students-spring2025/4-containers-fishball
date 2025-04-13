@@ -1,54 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Camera Capture</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        padding: 20px;
-      }
-      video {
-        width: 320px;
-        height: 240px;
-        border: 1px solid #ccc;
-        margin-top: 10px;
-        display: none;
-      }
-      canvas {
-        display: none;
-      }
-      form {
-        margin-top: 20px;
-      }
-      .flashes {
-        color: red;
-        list-style: none;
-        padding: 0;
-      }
-      .result-container {
-        margin-top: 20px;
-        text-align: left;
-      }
-      .result-container img {
-        width: 100%;
-        border: 1px solid #ccc;
-      }
-      .nav-link {
-        display: inline-block;
-        margin-top: 20px;
-        font-size: 1.1em;
-        text-decoration: none;
-        color: #3498db;
-      }
-      .nav-link:hover {
-        color: #2980b9;
-      }
-    </style>
-  </head>
-  <body>
+{% extends "base.html" %}
+
+{% block content %}
+
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <ul class="flashes">
@@ -61,21 +14,24 @@
 
     <h1>Capture Image from Camera</h1>
     <form id="cameraForm" action="/camera" method="post">
-      <div>
-        <button type="button" id="startCamera">Open Camera</button>
-        <button type="button" id="captureButton" style="display:none;">Capture Photo</button>
+      <div class="camera-section">
+        <video id="video" autoplay></video>
+
+        <!--button type="button" id="startCamera">Open Camera</button-->
+        <div class="capture-controls">
+          <button id="captureButton" type="button" class="capture-button">📷</button>
+        </div>
       </div>
-      <br>
-      <video id="video" autoplay></video>
-      <br>
+
       <!-- Hidden input to store the captured image as a base64 string -->
       <input type="hidden" name="captured_image" id="captured_image" />
       <button type="submit">Upload Captured Image</button>
     </form>
 
-    <canvas id="canvas"></canvas>
+    <p id="captureMessage" class="capture-message"></p>
 
     {% if files %}
+      <div class="results-section"></div>
       <h2>Captured Images &amp; Analysis Results</h2>
       <div style="display: flex; flex-wrap: wrap; justify-content: center;">
         {% for file in files %}
@@ -114,6 +70,7 @@
           {% endif %}
         {% endfor %}
       </div>
+      </div>
     {% endif %}
 
     <!-- Navigation link to go to the file upload page -->
@@ -121,37 +78,38 @@
       Or <a href="{{ url_for('upload') }}" class="nav-link">Upload Image from File</a>
     </p>
 
-    <script>
-      const startCameraBtn = document.getElementById('startCamera');
-      const captureBtn = document.getElementById('captureButton');
-      const video = document.getElementById('video');
-      const canvas = document.getElementById('canvas');
-      const capturedImageInput = document.getElementById('captured_image');
 
-      startCameraBtn.addEventListener('click', async () => {
-        try {
-          // Request access to the camera
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-          video.srcObject = stream;
-          video.style.display = 'block';
-          captureBtn.style.display = 'inline';
-        } catch (err) {
-          alert('Error accessing camera: ' + err);
-        }
-      });
+  <script>
+    const startCameraBtn = document.getElementById('startCamera');
+    const captureBtn = document.getElementById('captureButton');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const capturedImageInput = document.getElementById('captured_image');
 
-      captureBtn.addEventListener('click', () => {
-        // Set canvas dimensions to match the video stream
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const context = canvas.getContext('2d');
-        // Draw the current video frame to the canvas
-        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-        // Convert the canvas image to a base64-encoded JPEG string
-        const dataURL = canvas.toDataURL('image/jpeg');
-        capturedImageInput.value = dataURL;
-        alert('Photo captured. It will be uploaded along with your form data.');
-      });
-    </script>
-  </body>
-</html>
+    startCameraBtn.addEventListener('click', async () => {
+      try {
+        // Request access to the camera
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.style.display = 'block';
+        captureBtn.style.display = 'inline';
+      } catch (err) {
+        alert('Error accessing camera: ' + err);
+      }
+    });
+
+    captureBtn.addEventListener('click', () => {
+      // Set canvas dimensions to match the video stream
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext('2d');
+      // Draw the current video frame to the canvas
+      context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+      // Convert the canvas image to a base64-encoded JPEG string
+      const dataURL = canvas.toDataURL('image/jpeg');
+      capturedImageInput.value = dataURL;
+      captureMessage.textContent = "Photo captured! Ready to upload.";
+    });
+  </script>
+
+{% endblock %}

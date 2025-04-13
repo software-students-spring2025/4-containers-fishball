@@ -107,7 +107,7 @@ def test_index_post_no_file():
     with app.test_client() as client:
         response = client.post("/", data={}, follow_redirects=True)
         assert response.status_code == 200
-        assert b"Image Upload & Capture" in response.data
+        assert b"Facial Analysis" in response.data
 
 
 def test_index_post_empty_filename():
@@ -163,7 +163,7 @@ def test_get_image_not_found():
     with app.test_client() as client:
         response = client.get(f"/uploads/{non_existent_id}", follow_redirects=True)
         assert response.status_code == 200
-        assert b"Image Upload & Capture" in response.data
+        assert b"Facial Analysis" in response.data
 
 
 def test_load_image_from_request_file_invalid(monkeypatch):

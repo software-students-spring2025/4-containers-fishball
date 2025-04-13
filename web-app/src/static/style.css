@@ -1,0 +1,238 @@
+body {
+    font-family: Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+
+    /* Animated Gradient Background */
+    background: radial-gradient(ellipse at bottom, #e6ba62 0%, #cf93b0 40%, #1d4896 70%, #000000 100%);
+    background-size: 400% 400%;
+    animation: gradientBG 40s ease infinite;
+    color: white;
+}
+
+@keyframes gradientBG {
+    0% {
+      background-position: 50% 0%;
+    }
+    50% {
+      background-position: 50% 100%;
+    }
+    100% {
+      background-position: 50% 0%;
+    }
+}
+
+/* Main card */
+.container {
+    background: rgba(255, 255, 255, 0.1); 
+    backdrop-filter: blur(15px); 
+    -webkit-backdrop-filter: blur(15px); 
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    padding: 40px 30px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+    color: white;
+}
+  
+  /* Header text */
+  .container h1 {
+    margin-bottom: 10px;
+    font-size: 2.2em;
+    color: white;
+  }
+  
+  .container h3 {
+    margin-bottom: 30px;
+    font-weight: normal;
+    color: white;
+  }
+
+video {
+    width: 320px;
+    height: 240px;
+    margin-top: 10px;
+    display: none;
+    align-items: center;
+}
+
+canvas {
+    display: none;
+}
+
+form {
+    margin-top: 20px;
+}
+
+.flashes {
+    color: #00ff95cb;
+    list-style: none;
+    padding: 0;
+}
+
+.result-container {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.result-container img {
+    width: 100%;
+    border: 1px solid #ccc;
+}
+
+.nav-link {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 1.1em;
+    text-decoration: none;
+    color: #3498db;
+}
+
+.nav-link:hover {
+    color: #2980b9;
+}
+
+button, .button, input[type="file"]::file-selector-button {
+    background: rgba(0, 0, 0, 0.1);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    margin: 10px 5px;
+    border-radius: 10px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+  
+button:hover, .button:hover, input[type="file"]::file-selector-button:hover {
+    background-color: white;
+    color: #222222;
+}
+
+/* File input */
+input[type="file"] {
+    display: block;
+    margin: 0 auto 20px;
+    padding: 10px;
+}
+
+/* Image preview */
+.preview-box {
+    background-color: #f0f0f0;
+    border-radius: 12px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+/* Uploaded results */
+.results-section {
+    margin-top: 40px;
+    margin-bottom: 40px;
+    padding: 30px 20px;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.results-section h2 {
+    font-size: 1.8em;
+    color: #ffffff;
+}
+
+.camera-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px; /* space between video and button */
+    margin-top: 20px;
+}
+
+#video {
+    border-radius: 12px;
+    max-width: 320px;
+    height: auto;
+    background-color: black;
+    align-items: center;
+}
+
+.capture-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.capture-button {
+    background: rgba(0, 0, 0, 0.1);
+    color: white;
+    border: none;
+    width: 60px;       
+    height: 60px;      
+    padding: 0;        
+    border-radius: 50%;
+    font-size: 1.8em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.capture-button:hover {
+    background-color: white;
+    color: #222222;
+}
+
+.capture-message {
+    margin-top: 20px;
+    color: #00ff95cb; /* greenish success text */
+    font-size: 1.1em;
+}
+
+.video-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+.upload-options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px; /* spacing between input, OR text, and button */
+    margin-top: 20px;
+}
+
+.custom-file-upload {
+    background: rgba(0, 0, 0, 0.1);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .custom-file-upload:hover {
+    background-color: white;
+    color: #222222;;
+  }
+  
+  /* Hide the ugly real file input */
+  .custom-file-upload input[type="file"] {
+    display: none;
+  }
+  
+  .upload-options #fileName {
+    margin-left: 0px;
+    text-align: left;
+    font-size: 0.8em;
+    color: white;
+  }
+  

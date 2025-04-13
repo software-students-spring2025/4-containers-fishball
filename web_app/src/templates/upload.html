@@ -1,44 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Image Upload</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        padding: 20px;
-      }
-      form {
-        margin-top: 20px;
-      }
-      .flashes {
-        color: red;
-        list-style: none;
-        padding: 0;
-      }
-      .result-container {
-        margin-top: 20px;
-        text-align: left;
-      }
-      .result-container img {
-        width: 100%;
-        border: 1px solid #ccc;
-      }
-      .nav-link {
-        display: inline-block;
-        margin-top: 20px;
-        font-size: 1.1em;
-        text-decoration: none;
-        color: #3498db;
-      }
-      .nav-link:hover {
-        color: #2980b9;
-      }
-    </style>
-  </head>
-  <body>
+{% extends "base.html" %}
+
+{% block content %}
+
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <ul class="flashes">
@@ -103,5 +66,5 @@
     <p>
       Or <a href="{{ url_for('camera') }}" class="nav-link">Capture Image from Camera</a>
     </p>
-  </body>
-</html>
+
+    {% endblock %}
