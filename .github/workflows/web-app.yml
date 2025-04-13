@@ -36,9 +36,11 @@ jobs:
           pip install -r requirements.txt
 
       - name: Format Code with Black
-        run:
-          black machine-learning-client
+        run: |
+          black src/
+          black test_app.py
 
       - name: Lint Code with Pylint
-        run:
-          pylint machine-learning-client/*.py
+        run: |
+          pylint src/*.py
+          pylint test_app.py
