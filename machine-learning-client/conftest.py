@@ -14,14 +14,16 @@ if not hasattr(werkzeug, "__version__"):
 # Create a dummy module to stand in for deepface.
 dummy_deepface = types.ModuleType("deepface")
 
+
 # pylint: disable=too-few-public-methods
 class DummyDeepFace:
     """A dummy DeepFace class for testing purposes.
 
     Provides a dummy implementation of analyze that returns a fixed analysis result.
     """
+
     @staticmethod
-    def analyze(**kwargs): # pylint: disable=unused-argument
+    def analyze(**kwargs):  # pylint: disable=unused-argument
         """Dummy analyze method that accepts any keyword arguments and returns a fixed result."""
         return {"emotion": {"happy": 1.0}}
 
