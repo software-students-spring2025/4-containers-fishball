@@ -7,7 +7,12 @@ import os
 import pytest
 from PIL import Image
 from bson.objectid import ObjectId
-from src.app import app
+from requests import RequestException
+from src.app import (
+    load_image_from_request,
+    process_upload,
+    app,
+)
 
 os.environ.setdefault("SECRET_KEY", "test_secret_key")
 os.environ.setdefault("MONGO_DBNAME", "test_db")
@@ -20,9 +25,7 @@ def generate_valid_objectid():
     return str(ObjectId())
 
 
-###############################################################################
-# Fake Collection for Overriding MongoDB Operations in Tests
-###############################################################################
+# pylint: disable=unused-argument
 class FakeImagesCollection:
     """A fake collection to simulate MongoDB image operations in tests."""
 
@@ -52,9 +55,6 @@ class FakeImagesCollection:
         return self.data.get(_id, None)
 
 
-###############################################################################
-# Pytest Fixtures
-###############################################################################
 @pytest.fixture(autouse=True)
 def fake_images_collection(monkeypatch):
     """Fixture to override the images_collection with a fake collection."""
@@ -94,9 +94,6 @@ def fake_requests_post(monkeypatch):
     monkeypatch.setattr("src.app.requests.post", fake_post)
 
 
-###############################################################################
-# Test Cases
-###############################################################################
 def test_index_get():
     """Test that the GET '/' endpoint returns 200 OK and contains upload text."""
     with app.test_client() as client:
@@ -167,3 +164,85 @@ def test_get_image_not_found():
         response = client.get(f"/uploads/{non_existent_id}", follow_redirects=True)
         assert response.status_code == 200
         assert b"Image Upload & Capture" in response.data
+
+
+def test_load_image_from_request_file_invalid(monkeypatch):
+    """Test that load_image_from_request returns (None, None)
+    when an invalid image file is provided."""
+    fake_file = io.BytesIO(b"not an image")
+    fake_file.filename = "invalid.jpg"
+
+    with app.test_request_context(method="POST", data={"image": fake_file}):
+        image, filename = load_image_from_request()
+        assert image is None
+        assert filename is None
+
+
+def test_load_image_from_request_captured_invalid(monkeypatch):
+    """Test that load_image_from_request returns (None, None)
+    when captured image data is invalid."""
+    with app.test_request_context(
+        method="POST", data={"captured_image": "invaliddata"}
+    ):
+        image, filename = load_image_from_request()
+        assert image is None
+        assert filename is None
+
+
+def test_load_image_from_request_no_input(monkeypatch):
+    """Test that load_image_from_request returns (None, None)
+    when neither file nor captured image is provided."""
+    with app.test_request_context(method="POST", data={}):
+        image, filename = load_image_from_request()
+        assert image is None
+        assert filename is None
+
+
+# pylint: disable=too-few-public-methods
+class DummyInsertResult:
+    """Dummy result to simulate MongoDB's insert_one return value."""
+
+    inserted_id = "dummy_id"
+
+
+def fake_insert_one(_doc):
+    """Fake insert_one function that simulates storing a document."""
+    return DummyInsertResult()
+
+
+def fake_requests_post_success(_url, _json, _timeout):
+    """Fake requests.post function that returns a successful fake response."""
+    return FakeResponse({"results": {"dummy": "result"}}, status_code=200)
+
+
+def fake_requests_post_error(_url, _json, _timeout):
+    """Fake requests.post function that simulates an error response by raising RequestException."""
+    raise RequestException("ML client error")
+
+
+def test_process_upload_oversize(monkeypatch):
+    """
+    Test that process_upload returns None if the processed image exceeds MAX_IMAGE_SIZE,
+    and that it flashes an error.
+    """
+    img = Image.new("RGB", (5000, 5000), color="blue")
+    flash_messages = []
+    monkeypatch.setattr("src.app.flash", flash_messages.append)
+    monkeypatch.setattr("src.app.MAX_IMAGE_SIZE", 1)
+    result = process_upload(img, "big.jpg")
+    assert result is None
+    assert any("exceeds" in msg for msg in flash_messages)
+
+
+def test_get_image_invalid_objectid(monkeypatch):
+    """
+    Test GET /uploads/ with an invalid ObjectId
+    and verify that it flashes an error and redirects.
+    """
+    with app.test_client() as client:
+        response = client.get("/uploads/invalid-id", follow_redirects=True)
+        assert response.status_code == 200
+        assert (
+            b"Error retrieving image" in response.data
+            or b"Image not found" in response.data
+        )

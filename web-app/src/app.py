@@ -117,12 +117,7 @@ def process_upload(image_obj, filename):
 def index():
     """
     Handles image upload and displays uploaded images.
-    On a POST request:
-      - Processes the uploaded image.
-      - Checks if its size is <= 16MB.
-      - Converts it to JPEG format.
-      - Sends it to the ML client for processing.
-      - Stores the image and prediction result in MongoDB.
+    For POST requests: processes the image and stores it with its prediction in MongoDB.
     On a GET request, retrieves and renders all stored images.
     """
     if request.method == "POST":
