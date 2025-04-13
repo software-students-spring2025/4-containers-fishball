@@ -4,26 +4,7 @@
     <meta charset="UTF-8" />
     <title>Main Page</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        padding: 40px;
-      }
-      .button {
-        display: inline-block;
-        padding: 10px 20px;
-        margin: 20px;
-        font-size: 1.2em;
-        text-decoration: none;
-        background-color: #3498db;
-        color: #fff;
-        border-radius: 5px;
-      }
-      .button:hover {
-        background-color: #2980b9;
-      }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
     <h1>Welcome!</h1>
