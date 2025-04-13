@@ -35,7 +35,7 @@ Users can enter the web-app, then upload an image through the upload feature or 
 ## Prerequisites
 
 - Docker installed on your system
-- Python 3.10+ for local development (optional - containers include Python)
+- Python 3.9+ for local development (optional - containers include Python)
 
 ## Setup
 
@@ -46,15 +46,5 @@ Users can enter the web-app, then upload an image through the upload feature or 
 ## Configuration
 
 - MongoDB runs on port 27017
-  - Root username: `root`
-  - Root password: `example`
 - Web app runs on port 5001
 - ML client runs as a background service
-
-## Initial Data
-
-To populate the database with initial data:
-
-1. Connect to MongoDB:
-   ```bash
-   docker exec -it project-root_mongodb_1 mongo -u root -p example
