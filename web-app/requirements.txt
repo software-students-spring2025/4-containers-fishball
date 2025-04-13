@@ -6,3 +6,5 @@ requests
 black
 pylint
 python-dotenv
+pytest
+pytest-cov

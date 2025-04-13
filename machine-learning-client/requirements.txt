@@ -10,3 +10,5 @@ Pillow
 black
 pylint
 numpy<2.0
+pytest
+pytest-cov

@@ -21,6 +21,12 @@ jobs:
         ports:
           - 27017:27017
 
+    env:
+      SECRET_KEY: test_secret_key
+      MONGO_DBNAME: test_db
+      MONGO_URI: mongodb://localhost:27017/test_db
+      ML_CLIENT_URL: http://fake-ml-client
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -28,18 +34,22 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: "3.9"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run pylint
-        run: pylint src/*.py
+      - name: Format Code with Black
+        run: |
+          black src/*.py
+          black *.py
 
-      - name: Check formatting with black
-        run: black --check src/
+      - name: Lint Code with Pylint
+        run: |
+          pylint src/*.py
+          pylint *.py
 
       - name: Run tests
         run: pytest --cov=src --cov-report=term-missing

@@ -41,11 +41,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run pylint
-        run: pylint src/*.py
+      - name: Format Code with Black
+        run: |
+          black src/*.py
+          black *.py
 
-      - name: Check formatting with black
-        run: black --check src/
+      - name: Lint Code with Pylint
+        run: |
+          pylint src/*.py
+          pylint *.py
 
       - name: Run tests
         run: pytest --cov=src --cov-report=term-missing
